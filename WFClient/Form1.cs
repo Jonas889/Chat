@@ -68,7 +68,7 @@ namespace WFClient
 
         private void btnSend_Click(object sender, EventArgs e)
         {
-            message = txtMessage.Text;
+            message = txtUserName.Text + ": " + txtMessage.Text;
             try
             {
                 NetworkStream n = client.GetStream();
@@ -94,7 +94,7 @@ namespace WFClient
             {
                 recieve = new BinaryReader(n).ReadString();
                 //recieve = reader.ReadLine();
-                txtChat.AppendText(txtUserName.Text + ": " + recieve + Environment.NewLine);
+                txtChat.AppendText(recieve + Environment.NewLine);
                 recieve = "";
 
             }
