@@ -58,7 +58,7 @@ namespace Networking_server
                 foreach (ClientHandler tmpClient in clients)
                 {
                     //StreamWriter writer = new StreamWriter(tmpClient.tcpclient.GetStream());
-                    if (tmpClient != client)
+                    if (clients.Count > 1)
                     {
                         NetworkStream n = tmpClient.tcpclient.GetStream();
                         BinaryWriter w = new BinaryWriter(n);

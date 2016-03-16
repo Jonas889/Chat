@@ -94,7 +94,7 @@ namespace WFClient
             {
                 recieve = new BinaryReader(n).ReadString();
                 //recieve = reader.ReadLine();
-                txtChat.AppendText("Name:" + recieve + Environment.NewLine);
+                txtChat.AppendText(txtUserName.Text + ": " + recieve + Environment.NewLine);
                 recieve = "";
 
             }
