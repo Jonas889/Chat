@@ -17,10 +17,11 @@ namespace WFClient
     public partial class chatClient : Form
     {
         private TcpClient client;
-        public StreamReader reader;
-        public StreamWriter writer;
+        //public StreamReader reader;
+        //public StreamWriter writer;
         public string message;
         public string recieve;
+        public int port;
         public chatClient()
         {
             InitializeComponent();
@@ -28,7 +29,7 @@ namespace WFClient
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            int port = CheckValidPort();
+            port = CheckValidPort();
             //string serverIP = CheckServerIP();
             if (port != 0 && port > 6100 && port < 6106)
             {
@@ -36,54 +37,66 @@ namespace WFClient
                 try
                 {
                     client.Connect(txtServerIP.Text, port);
-                    Sender.RunWorkerAsync();
                     Listener.RunWorkerAsync();
-
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
-                    throw;
+                    MessageBox.Show(ex.Message);
                 }
+
             }
         }
 
         //private string CheckServerIP()
         //{
         //    string ServerIP;
-            
+
         //}
 
         private int CheckValidPort()
         {
-            int port;
-            if (Int32.TryParse(txtServerPort.Text, out port))
-                return port;           
+            int testPort;
+            if (Int32.TryParse(txtServerPort.Text, out testPort))
+                return testPort;
             else
                 return 0;
 
         }
 
-        private void Sender_DoWork(object sender, DoWorkEventArgs e)
-        {
-            string message = "";
 
+
+        private void btnSend_Click(object sender, EventArgs e)
+        {
+            message = txtMessage.Text;
             try
             {
                 NetworkStream n = client.GetStream();
-
-                while (!message.Equals("quit"))
-                {
-                    message = txtMessage.Text;
-                    writer.Write(message);
-                    writer.Flush();
-                }
-
-                client.Close();
+                BinaryWriter writer = new BinaryWriter(n);
+                writer.Write(message);
+                //writer = new StreamWriter(client.GetStream());
+                //writer.Write(message);
+                writer.Flush();
+                txtMessage.Text = "";
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private void Listener_DoWork(object sender, DoWorkEventArgs e)
+        {
+            NetworkStream n = client.GetStream();
+            
+            while (client.Connected)
+            {
+                recieve = new BinaryReader(n).ReadString();
+                //recieve = reader.ReadLine();
+                txtChat.AppendText("Name:" + recieve + Environment.NewLine);
+                recieve = "";
+
             }
         }
     }

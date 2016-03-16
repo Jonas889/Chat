@@ -33,17 +33,16 @@
             this.txtChat = new System.Windows.Forms.TextBox();
             this.lbClients = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.txtServerIP = new System.Windows.Forms.TextBox();
-            this.txtServerPort = new System.Windows.Forms.TextBox();
-            this.lblServerIP = new System.Windows.Forms.Label();
-            this.lblServerPort = new System.Windows.Forms.Label();
-            this.btnConnect = new System.Windows.Forms.Button();
-            this.txtUserName = new System.Windows.Forms.TextBox();
-            this.lblUserName = new System.Windows.Forms.Label();
-            this.Listener = new System.ComponentModel.BackgroundWorker();
-            this.Sender = new System.ComponentModel.BackgroundWorker();
             this.lblConnectionStatus = new System.Windows.Forms.Label();
+            this.btnConnect = new System.Windows.Forms.Button();
+            this.lblServerPort = new System.Windows.Forms.Label();
+            this.lblServerIP = new System.Windows.Forms.Label();
+            this.txtServerPort = new System.Windows.Forms.TextBox();
+            this.txtServerIP = new System.Windows.Forms.TextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lblUserName = new System.Windows.Forms.Label();
+            this.txtUserName = new System.Windows.Forms.TextBox();
+            this.Listener = new System.ComponentModel.BackgroundWorker();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +63,7 @@
             this.btnSend.TabIndex = 1;
             this.btnSend.Text = "Send";
             this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
             // txtChat
             // 
@@ -96,48 +96,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Server";
             // 
-            // groupBox2
+            // lblConnectionStatus
             // 
-            this.groupBox2.Controls.Add(this.lblUserName);
-            this.groupBox2.Controls.Add(this.txtUserName);
-            this.groupBox2.Location = new System.Drawing.Point(458, 12);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(448, 135);
-            this.groupBox2.TabIndex = 5;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Client";
-            // 
-            // txtServerIP
-            // 
-            this.txtServerIP.Location = new System.Drawing.Point(111, 19);
-            this.txtServerIP.Name = "txtServerIP";
-            this.txtServerIP.Size = new System.Drawing.Size(123, 20);
-            this.txtServerIP.TabIndex = 0;
-            // 
-            // txtServerPort
-            // 
-            this.txtServerPort.Location = new System.Drawing.Point(111, 56);
-            this.txtServerPort.Name = "txtServerPort";
-            this.txtServerPort.Size = new System.Drawing.Size(123, 20);
-            this.txtServerPort.TabIndex = 1;
-            // 
-            // lblServerIP
-            // 
-            this.lblServerIP.AutoSize = true;
-            this.lblServerIP.Location = new System.Drawing.Point(7, 25);
-            this.lblServerIP.Name = "lblServerIP";
-            this.lblServerIP.Size = new System.Drawing.Size(95, 13);
-            this.lblServerIP.TabIndex = 2;
-            this.lblServerIP.Text = "IP (xxx.xxx.xxx.xxx)";
-            // 
-            // lblServerPort
-            // 
-            this.lblServerPort.AutoSize = true;
-            this.lblServerPort.Location = new System.Drawing.Point(10, 63);
-            this.lblServerPort.Name = "lblServerPort";
-            this.lblServerPort.Size = new System.Drawing.Size(86, 13);
-            this.lblServerPort.TabIndex = 3;
-            this.lblServerPort.Text = "Port (6100-6105)";
+            this.lblConnectionStatus.AutoSize = true;
+            this.lblConnectionStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblConnectionStatus.Location = new System.Drawing.Point(150, 97);
+            this.lblConnectionStatus.Name = "lblConnectionStatus";
+            this.lblConnectionStatus.Size = new System.Drawing.Size(150, 24);
+            this.lblConnectionStatus.TabIndex = 5;
+            this.lblConnectionStatus.Text = "Not Connected";
             // 
             // btnConnect
             // 
@@ -149,12 +116,48 @@
             this.btnConnect.UseVisualStyleBackColor = true;
             this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
-            // txtUserName
+            // lblServerPort
             // 
-            this.txtUserName.Location = new System.Drawing.Point(88, 24);
-            this.txtUserName.Name = "txtUserName";
-            this.txtUserName.Size = new System.Drawing.Size(342, 20);
-            this.txtUserName.TabIndex = 0;
+            this.lblServerPort.AutoSize = true;
+            this.lblServerPort.Location = new System.Drawing.Point(10, 63);
+            this.lblServerPort.Name = "lblServerPort";
+            this.lblServerPort.Size = new System.Drawing.Size(86, 13);
+            this.lblServerPort.TabIndex = 3;
+            this.lblServerPort.Text = "Port (6100-6105)";
+            // 
+            // lblServerIP
+            // 
+            this.lblServerIP.AutoSize = true;
+            this.lblServerIP.Location = new System.Drawing.Point(7, 25);
+            this.lblServerIP.Name = "lblServerIP";
+            this.lblServerIP.Size = new System.Drawing.Size(95, 13);
+            this.lblServerIP.TabIndex = 2;
+            this.lblServerIP.Text = "IP (xxx.xxx.xxx.xxx)";
+            // 
+            // txtServerPort
+            // 
+            this.txtServerPort.Location = new System.Drawing.Point(111, 56);
+            this.txtServerPort.Name = "txtServerPort";
+            this.txtServerPort.Size = new System.Drawing.Size(123, 20);
+            this.txtServerPort.TabIndex = 1;
+            // 
+            // txtServerIP
+            // 
+            this.txtServerIP.Location = new System.Drawing.Point(111, 19);
+            this.txtServerIP.Name = "txtServerIP";
+            this.txtServerIP.Size = new System.Drawing.Size(123, 20);
+            this.txtServerIP.TabIndex = 0;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.lblUserName);
+            this.groupBox2.Controls.Add(this.txtUserName);
+            this.groupBox2.Location = new System.Drawing.Point(458, 12);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(448, 135);
+            this.groupBox2.TabIndex = 5;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Client";
             // 
             // lblUserName
             // 
@@ -165,19 +168,16 @@
             this.lblUserName.TabIndex = 1;
             this.lblUserName.Text = "Username:";
             // 
-            // Sender
+            // txtUserName
             // 
-            this.Sender.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Sender_DoWork);
+            this.txtUserName.Location = new System.Drawing.Point(88, 24);
+            this.txtUserName.Name = "txtUserName";
+            this.txtUserName.Size = new System.Drawing.Size(342, 20);
+            this.txtUserName.TabIndex = 0;
             // 
-            // lblConnectionStatus
+            // Listener
             // 
-            this.lblConnectionStatus.AutoSize = true;
-            this.lblConnectionStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblConnectionStatus.Location = new System.Drawing.Point(150, 97);
-            this.lblConnectionStatus.Name = "lblConnectionStatus";
-            this.lblConnectionStatus.Size = new System.Drawing.Size(150, 24);
-            this.lblConnectionStatus.TabIndex = 5;
-            this.lblConnectionStatus.Text = "Not Connected";
+            this.Listener.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Listener_DoWork);
             // 
             // chatClient
             // 
@@ -217,7 +217,6 @@
         private System.Windows.Forms.Label lblUserName;
         private System.Windows.Forms.TextBox txtUserName;
         private System.ComponentModel.BackgroundWorker Listener;
-        private System.ComponentModel.BackgroundWorker Sender;
         private System.Windows.Forms.Label lblConnectionStatus;
     }
 }
