@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace WFClient
 {
@@ -19,7 +13,7 @@ namespace WFClient
         private TcpClient client;
         //public StreamReader reader;
         //public StreamWriter writer;
-        public string message;
+        public Message message;
         public string recieve;
         public int port;
         public chatClient()
@@ -38,6 +32,8 @@ namespace WFClient
                 {
                     client.Connect(txtServerIP.Text, port);
                     Listener.RunWorkerAsync();
+
+                    lblConnectionStatus.Text = "Connected";
                 }
                 catch (Exception ex)
                 {
@@ -68,15 +64,13 @@ namespace WFClient
 
         private void btnSend_Click(object sender, EventArgs e)
         {
-            message = txtUserName.Text + ": " + txtMessage.Text;
+            //message = txtUserName.Text + ": " + txtMessage.Text;
+            Message sendMessage = new Message(txtUserName.Text, txtMessage.Text);
+            XmlSerializer x = new XmlSerializer(sendMessage.GetType());
             try
             {
-                NetworkStream n = client.GetStream();
-                BinaryWriter writer = new BinaryWriter(n);
-                writer.Write(message);
-                //writer = new StreamWriter(client.GetStream());
-                //writer.Write(message);
-                writer.Flush();
+                string nwMessage = JsonConvert.SerializeObject(sendMessage);
+                
                 txtMessage.Text = "";
             }
             catch (Exception ex)
@@ -88,16 +82,48 @@ namespace WFClient
 
         private void Listener_DoWork(object sender, DoWorkEventArgs e)
         {
-            NetworkStream n = client.GetStream();
-            
+            NetworkStream n = client.GetStream();           
             while (client.Connected)
             {
+                try
+                {
                 recieve = new BinaryReader(n).ReadString();
-                //recieve = reader.ReadLine();
-                txtChat.AppendText(recieve + Environment.NewLine);
+                }
+                catch (Exception)
+                {
+                    lblConnectionStatus.Text = "Disconnected";
+                    MessageBox.Show("Lost connection to server.");
+                }
+                message = JsonConvert.DeserializeObject<Message>(recieve);
+                //txtChat.AppendText(message.Time + Environment.NewLine + message.Username + ": " +  message.ChatMessage + Environment.NewLine);
+                txtChat.Invoke(new MethodInvoker(delegate { txtChat.Text = message.Time + Environment.NewLine + message.Username + ": " + message.ChatMessage + Environment.NewLine; }));
                 recieve = "";
 
             }
+            lblConnectionStatus.Text = "Disconnected";
+        }
+        #region supportingEvents
+        private void txtMessage_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnSend_Click(sender, e);
+            }
+
+        }
+        #endregion
+
+        private void Listener_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+        }
+
+        private void SendMessage(string nwMessage)
+        {
+            NetworkStream n = client.GetStream();
+            BinaryWriter writer = new BinaryWriter(n);
+            writer.Write(nwMessage);
+            writer.Flush();
         }
     }
 }

@@ -54,6 +54,7 @@
             this.txtMessage.Name = "txtMessage";
             this.txtMessage.Size = new System.Drawing.Size(723, 87);
             this.txtMessage.TabIndex = 0;
+            this.txtMessage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtMessage_KeyUp);
             // 
             // btnSend
             // 
@@ -178,6 +179,7 @@
             // Listener
             // 
             this.Listener.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Listener_DoWork);
+            this.Listener.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.Listener_RunWorkerCompleted);
             // 
             // chatClient
             // 

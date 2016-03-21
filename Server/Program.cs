@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using WFClient;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +14,7 @@ namespace Networking_server
 {
     class Program
     {
+         static List<string> usersConnected = new List<string>();
         static void Main(string[] args)
         {
             Server myServer = new Server();
@@ -37,7 +40,7 @@ namespace Networking_server
                         TcpClient c = listener.AcceptTcpClient();
                         ClientHandler newClient = new ClientHandler(c, this);
                         clients.Add(newClient);
-                        Console.WriteLine("New incomming connection from: " + newClient.tcpclient.Client);
+                        Console.WriteLine("New incomming connection from: " + c.Client.RemoteEndPoint.ToString());
                         Thread clientThread = new Thread(newClient.Run);
                         clientThread.Start();
                     }
@@ -79,8 +82,8 @@ namespace Networking_server
             public void DisconnectClient(ClientHandler client)
             {
                 clients.Remove(client);
-                Console.WriteLine("Client X has left the building...");
-                Broadcast(client, "Client X has left the building...");
+                Console.WriteLine($"Client {client.userName} has left the building...");
+                Broadcast(client, $"Client {client.userName} has left the building...");
             }
         }
 
@@ -88,6 +91,7 @@ namespace Networking_server
         {
             public TcpClient tcpclient;
             private Server myServer;
+            public string userName;
             public ClientHandler(TcpClient c, Server server)
             {
                 tcpclient = c;
@@ -99,12 +103,19 @@ namespace Networking_server
                 try
                 {
                     string message = "";
-                    while (!message.Equals("quit"))
+                    while (tcpclient.Connected)
                     {
                         NetworkStream n = tcpclient.GetStream();
                         message = new BinaryReader(n).ReadString();
-                        //StreamReader reader = new StreamReader(tcpclient.GetStream());
-                        //message = reader.ReadLine();
+                        Message deSerializedMessage = JsonConvert.DeserializeObject<Message>(message);
+                        if (deSerializedMessage.ChatMessage.Contains("#¤%start%¤#"))
+                        {
+                            userName = deSerializedMessage.Username;
+                        }
+                        foreach (var c in usersConnected)
+                        {
+                            deSerializedMessage.Users.Add(c);
+                        }
                         myServer.Broadcast(this, message);
                         Console.WriteLine(message);
                     }
@@ -115,6 +126,8 @@ namespace Networking_server
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
+                    myServer.DisconnectClient(this);
+                    tcpclient.Close();
                 }
             }
         }
